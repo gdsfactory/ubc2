@@ -9,7 +9,7 @@ from ubcpdk.tech import LAYER
 
 from ubc2.config import PATH
 
-size = (440, 470)
+size = (440, 410)
 add_gc = ubcpdk.components.add_fiber_array
 pack = partial(
     gf.pack, max_size=size, add_ports_prefix=False, add_ports_suffix=False, spacing=2
