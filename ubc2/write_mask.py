@@ -5,8 +5,9 @@ from pathlib import Path
 import gdsfactory as gf
 import ubcpdk
 from omegaconf import OmegaConf
-from ubc1.config import PATH
 from ubcpdk.tech import LAYER
+
+from ubc2.config import PATH
 
 size = (440, 470)
 add_gc = ubcpdk.components.add_fiber_array

@@ -1,10 +1,11 @@
 """Write all mask for the course."""
 import shutil
 
-import ubc1.ubc_helge as m12
-import ubc1.ubc_joaquin_matres1 as m11
-import ubc1.ubc_simon as m13
 from ubcpdk.config import PATH
+
+import ubc2.ubc_helge as m12
+import ubc2.ubc_joaquin_matres1 as m11
+import ubc2.ubc_simon as m13
 
 
 def test_masks_2023_v1():

@@ -11,8 +11,9 @@ from gdsfactory.components.coupler_ring import coupler_ring as _coupler_ring
 from gdsfactory.components.straight import straight
 from gdsfactory.components.via_stack import via_stack_heater_m3
 from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2
-from ubc1.write_mask import write_mask_gds_with_metadata
 from ubcpdk.tech import LAYER
+
+from ubc2.write_mask import write_mask_gds_with_metadata
 
 via_stack_heater_m3_mini = partial(via_stack_heater_m3, size=(4, 4))
 

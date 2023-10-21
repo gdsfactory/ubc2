@@ -3,8 +3,9 @@ from pathlib import Path
 import gdsfactory as gf
 import ubcpdk
 import ubcpdk.components as pdk
-from ubc1.write_mask import pack, size, write_mask_gds_with_metadata
 from ubcpdk.tech import LAYER
+
+from ubc2.write_mask import pack, size, write_mask_gds_with_metadata
 
 add_gc = ubcpdk.components.add_fiber_array
 nm = 1e-3
