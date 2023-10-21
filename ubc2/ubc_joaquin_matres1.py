@@ -45,29 +45,31 @@ def test_mask1() -> Path:
 
 def test_mask2() -> Path:
     """spirals for extracting straight waveguide loss"""
-    N = 12
-    radius = 10
+    N = 11
+    radius = 5
 
     e = [
         ubcpdk.components.add_fiber_array(
+            optical_routing_type=1,
             component=ubcpdk.components.spiral(
                 N=N,
                 radius=radius,
                 y_straight_inner_top=0,
                 x_inner_length_cutback=0,
                 info=dict(does=["spiral", "te1550"]),
-            )
+            ),
         )
     ]
 
     e.append(
         ubcpdk.components.add_fiber_array(
+            optical_routing_type=1,
             component=ubcpdk.components.spiral(
                 N=N,
                 radius=radius,
                 y_straight_inner_top=0,
-                x_inner_length_cutback=185,
-            )
+                x_inner_length_cutback=150,
+            ),
         )
     )
 
@@ -199,10 +201,10 @@ def test_mask7() -> Path:
 
 if __name__ == "__main__":
     # c = test_mask1()  # dbr and mzi
-    # c = test_mask2()  # spirals
+    c = test_mask2()  # spirals
     # c = test_mask3()  # coupler and crossing
     # c = test_mask4()  # heated mzis
-    c = test_mask5()  # heated rings
+    # c = test_mask5()  # heated rings
     # c = test_mask6()  # 1x2 mmis
     # c = test_mask7()  # 2x2mmis
     gf.show(c)
