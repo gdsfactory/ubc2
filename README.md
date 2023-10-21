@@ -1,8 +1,6 @@
 # ubc2 0.0.1
 
-ubc
-
-## Usage
+edx course submission for 2023 October
 
 ## Installation
 

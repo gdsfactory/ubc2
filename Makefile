@@ -19,6 +19,9 @@ build:
 	pip install build
 	python -m build
 
+mask:
+	python ubc2/test_masks.py
+
 jupytext:
 	jupytext docs/**/*.ipynb --to py
 
