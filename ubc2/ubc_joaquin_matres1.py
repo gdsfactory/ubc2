@@ -182,8 +182,8 @@ def test_mask7() -> Path:
     mmi2x2_with_sbend.name = "mmi2x2_with_sbend"
 
     mmis = []
-    mmis += [cutback_2x2(component=pdk.ebeam_bdc_te1550, cols=3)]
-    mmis += [cutback_2x2(component=mmi2x2_with_sbend, cols=6)]
+    mmis += [cutback_2x2(component=pdk.ebeam_bdc_te1550, cols=2)]
+    mmis += [cutback_2x2(component=mmi2x2_with_sbend, cols=4)]
 
     mmis += [mmi2x2_with_sbend]
     mmis += [pdk.ebeam_bdc_te1550()]
@@ -194,6 +194,8 @@ def test_mask7() -> Path:
     c = pack(mmis_gc)
 
     m = c[0]
+    if len(c) > 1:
+        raise ValueError(f"Failed to pack. It requires {len(c)}")
     m.name = "EBeam_JoaquinMatres_17"
     _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
     return write_mask_gds_with_metadata(m)
@@ -205,8 +207,8 @@ if __name__ == "__main__":
     # c = test_mask3()  # coupler and crossing
     # c = test_mask4()  # heated mzis
     # c = test_mask5()  # heated rings
-    c = test_mask6()  # 1x2 mmis
-    # c = test_mask7()  # 2x2mmis
+    # c = test_mask6()  # 1x2 mmis
+    c = test_mask7()  # 2x2mmis
     gf.show(c)
     # c = partial(
     #     gf.components.mmi2x2_with_sbend,
