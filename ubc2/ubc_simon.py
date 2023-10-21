@@ -365,12 +365,12 @@ def test_mask1() -> Path:
 
     m.add_ports(g.ports)
     _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
-    m.name = "EBeam_JoaquinMatres_Simon_0"
+    m.name = "EBeam_heaters_JoaquinMatres_Simon_0"
     return write_mask_gds_with_metadata(m)
 
 
 def crosstalk_experiment_parametrized_mask(
-    name="EBeam_JoaquinMatres_Simon_1",
+    name="EBeam_heaters_JoaquinMatres_Simon_1",
     num_gcs: int = 10,
     num_gc_per_pitch: int = 5,
     sep_resonators: float = 15.0,
@@ -379,7 +379,6 @@ def crosstalk_experiment_parametrized_mask(
     fill_layers=None,
     fill_margin=2,
     fill_size=(0.5, 0.5),
-    padding=20,
 ) -> gf.Component:
     """Ring resonators with thermal cross-talk.
 
@@ -393,7 +392,6 @@ def crosstalk_experiment_parametrized_mask(
         fill_layers: layers to add as unity dennity fill around the rings.
         fill_margin: keepout between the fill_layers and the same design layers.
         fill_size: tiling size.
-        padding: how much to extend the fill beyond the ring component.
     """
     m = gf.Component()
 
@@ -552,7 +550,7 @@ def crosstalk_experiment_parametrized_mask(
 def test_mask3() -> Path:
     """Rings with thermal crosstalk, close rings"""
     m = crosstalk_experiment_parametrized_mask(
-        name="EBeam_JoaquinMatres_Simon_1",
+        name="EBeam_heaters_JoaquinMatres_Simon_1",
         sep_resonators=5.0,
         ring_y_offset=20.0,
         resonator_func=rings_proximity,
@@ -563,7 +561,7 @@ def test_mask3() -> Path:
 def test_mask4() -> Path:
     """Rings with thermal crosstalk, far rings"""
     m = crosstalk_experiment_parametrized_mask(
-        name="EBeam_JoaquinMatres_Simon_2",
+        name="EBeam_heaters_JoaquinMatres_Simon_2",
         sep_resonators=20.0,
         ring_y_offset=40.0,
         resonator_func=rings_proximity,
@@ -574,7 +572,7 @@ def test_mask4() -> Path:
 def test_mask5() -> Path:
     """Rings with thermal crosstalk, metal fill"""
     m = crosstalk_experiment_parametrized_mask(
-        name="EBeam_JoaquinMatres_Simon_3",
+        name="EBeam_heaters_JoaquinMatres_Simon_3",
         sep_resonators=20.0,
         ring_y_offset=40.0,
         resonator_func=rings_proximity,
@@ -586,7 +584,7 @@ def test_mask5() -> Path:
 def test_mask6() -> Path:
     """Rings with thermal crosstalk, silicon fill"""
     m = crosstalk_experiment_parametrized_mask(
-        name="EBeam_JoaquinMatres_Simon_4",
+        name="EBeam_heaters_JoaquinMatres_Simon_4",
         sep_resonators=20.0,
         ring_y_offset=40.0,
         resonator_func=rings_proximity,
@@ -598,8 +596,8 @@ def test_mask6() -> Path:
 
 
 if __name__ == "__main__":
-    # m = test_mask1()
+    m = test_mask1()
     # m = test_mask3()
     # m = test_mask4()
-    m = test_mask5()
+    # m = test_mask5()
     gf.show(m)

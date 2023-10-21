@@ -101,7 +101,7 @@ def test_mask3() -> Path:
 
 
 def test_mask4() -> Path:
-    """MZI interferometers."""
+    """Heated MZI interferometers."""
     mzi = partial(gf.components.mzi, splitter=ubcpdk.components.ebeam_y_1550)
     mzis = [mzi(delta_length=delta_length) for delta_length in [10, 40, 100]]
     mzis_gc = [pdk.add_fiber_array(mzi) for mzi in mzis]
@@ -114,13 +114,13 @@ def test_mask4() -> Path:
 
     c = pack(mzis_gc + mzis_heater_gc)
     m = c[0]
-    m.name = "EBeam_JoaquinMatres_14"
+    m.name = "EBeam_heaters_JoaquinMatres_14"
     _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
     return write_mask_gds_with_metadata(m)
 
 
 def test_mask5() -> Path:
-    """Ring resonators."""
+    """Heated Ring resonators."""
     lengths_x = [0.2]
     gaps = [0.2]
 
@@ -139,7 +139,7 @@ def test_mask5() -> Path:
 
     c = pack(rings_gc)
     m = c[0]
-    m.name = "EBeam_JoaquinMatres_15"
+    m.name = "EBeam_heaters_JoaquinMatres_15"
     _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
     return write_mask_gds_with_metadata(m)
 
