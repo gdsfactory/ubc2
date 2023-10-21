@@ -15,17 +15,11 @@ from ubc2.write_mask import add_gc, pack, size, write_mask_gds_with_metadata
 
 def test_mask1() -> Path:
     """Add DBR cavities."""
-    e = [add_gc(ubcpdk.components.straight())]
-    e += [add_gc(pdk.mzi(delta_length=dl)) for dl in [9.32, 93.19]]
+    e = [add_gc(pdk.mzi(delta_length=dl)) for dl in [9.32, 93.19]]
     e += [
         add_gc(pdk.ring_single(radius=12, gap=gap, length_x=coupling_length))
         for gap in [0.2]
-        for coupling_length in [0.1, 2.5, 4.5]
-    ]
-    e += [
-        add_gc(pdk.ring_double(radius=12, gap=gap, length_x=coupling_length))
-        for gap in [0.2]
-        for coupling_length in [0.1]
+        for coupling_length in [0.1, 2.5]
     ]
 
     e += [
@@ -42,6 +36,8 @@ def test_mask1() -> Path:
 
     c = pack(e)
     m = c[0]
+    if len(c) > 1:
+        raise ValueError(f"Failed to pack. It requires {len(c)}")
     m.name = "EBeam_JoaquinMatres_11"
     _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
     return write_mask_gds_with_metadata(m)
@@ -123,9 +119,21 @@ def test_mask4() -> Path:
 
 def test_mask5() -> Path:
     """Ring resonators."""
-    rings = [pdk.ring_double_heater(length_x=length_x) for length_x in [2]]
+    lengths_x = [0.2]
+    gaps = [0.2]
+
+    rings = [
+        pdk.ring_double_heater(radius=12, length_x=length_x, gap=gap)
+        for length_x in lengths_x
+        for gap in gaps
+    ]
     rings = [gf.functions.rotate180(ring) for ring in rings]
     rings_gc = [pdk.add_fiber_array_pads_rf(ring) for ring in rings]
+    rings_gc += [
+        add_gc(pdk.ring_double(radius=12, gap=gap, length_x=length_x))
+        for gap in gaps
+        for length_x in lengths_x
+    ]
 
     c = pack(rings_gc)
     m = c[0]
@@ -190,7 +198,7 @@ def test_mask7() -> Path:
 
 
 if __name__ == "__main__":
-    c = test_mask1()  # dbr and mzi
+    # c = test_mask1()  # dbr and mzi
     # c = test_mask2()  # spirals
     # c = test_mask3()  # coupler and crossing
     # c = test_mask4()  # heated mzis
