@@ -157,7 +157,7 @@ def test_mask6() -> Path:
     ]
     mmis += [
         gf.components.cutback_splitter(
-            component=pdk.ebeam_y_1550, cols=6, rows=7, bend180=pdk.bend_euler180_sc
+            component=pdk.ebeam_y_1550, cols=4, rows=7, bend180=pdk.bend_euler180_sc
         )
     ]
     mmis_gc = [pdk.add_fiber_array(mmi, optical_routing_type=1) for mmi in mmis]
@@ -201,11 +201,11 @@ def test_mask7() -> Path:
 
 if __name__ == "__main__":
     # c = test_mask1()  # dbr and mzi
-    c = test_mask2()  # spirals
+    # c = test_mask2()  # spirals
     # c = test_mask3()  # coupler and crossing
     # c = test_mask4()  # heated mzis
     # c = test_mask5()  # heated rings
-    # c = test_mask6()  # 1x2 mmis
+    c = test_mask6()  # 1x2 mmis
     # c = test_mask7()  # 2x2mmis
     gf.show(c)
     # c = partial(
