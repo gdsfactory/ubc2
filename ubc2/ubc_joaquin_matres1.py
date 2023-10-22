@@ -10,7 +10,7 @@ from ubcpdk import tech
 from ubcpdk.tech import LAYER
 
 from ubc2.cutback_2x2 import cutback_2x2
-from ubc2.write_mask import add_gc, pack, size, write_mask_gds_with_metadata
+from ubc2.write_mask import add_gc, pack, size, write_mask_gds_with_metadata, size_actives
 
 
 def test_mask1() -> Path:
@@ -115,7 +115,7 @@ def test_mask4() -> Path:
     c = pack(mzis_gc + mzis_heater_gc)
     m = c[0]
     m.name = "EBeam_heaters_JoaquinMatres_14"
-    _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
+    _ = m << gf.components.rectangle(size=size_actives, layer=LAYER.FLOORPLAN)
     return write_mask_gds_with_metadata(m)
 
 
@@ -140,7 +140,7 @@ def test_mask5() -> Path:
     c = pack(rings_gc)
     m = c[0]
     m.name = "EBeam_heaters_JoaquinMatres_15"
-    _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
+    _ = m << gf.components.rectangle(size=size_actives, layer=LAYER.FLOORPLAN)
     return write_mask_gds_with_metadata(m)
 
 

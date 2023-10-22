@@ -9,11 +9,13 @@ from ubcpdk.tech import LAYER
 
 from ubc2.config import PATH
 
-size = (440, 410)
+size_actives = (440, 410)
+size  = (605, 440)
 add_gc = ubcpdk.components.add_fiber_array
 pack = partial(
     gf.pack, max_size=size, add_ports_prefix=False, add_ports_suffix=False, spacing=2
 )
+pack_actives = partial(pack, max_size=size_actives)
 
 
 def write_mask_gds_with_metadata(m) -> Path:
