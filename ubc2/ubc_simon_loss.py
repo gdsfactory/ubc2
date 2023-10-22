@@ -10,6 +10,8 @@ from gdsfactory.components.via_stack import via_stack_heater_m3
 from gdsfactory.typings import Tuple
 from ubcpdk.tech import LAYER
 
+from ubc2.write_mask import write_mask_gds_with_metadata
+
 via_stack_heater_m3_mini = partial(via_stack_heater_m3, size=(4, 4))
 
 
@@ -39,13 +41,13 @@ def continuum_coupling(
     s1 = gf.Section(
         width=width,
         layer=LAYER.WG,
-        offset=slab_width / 2 + gap + width / 2,
+        offset=-(slab_width / 2 + gap + width / 2),
         name="continuum",
     )
     s2 = gf.Section(
         width=slab_width,
         layer=LAYER.WG,
-        offset=slab_width / 2 + gap + width / 2,
+        offset=-(slab_width / 2 + gap + width / 2),
         name="continuum",
     )
 
@@ -83,69 +85,45 @@ def continuum_coupling(
 
 
 def test_mask_continuum(
-    gaps: Tuple[float] = (0.2, 0.3, 0.4),
+    gaps: Tuple[float] = (0.15,),
     widths: Tuple[float] = (0.5,),
-    lengths: Tuple[float] = (100,),
-    slab_width: float = 30,
-    name: str = "EBeam_simbilod_1",
+    lengths: Tuple[float] = (
+        0.001,
+        50,
+        100,
+        150,
+        200,
+    ),
+    slab_width: float = 25,
+    name: str = "EBeam_simbilod_10",
 ) -> Path:
     """Slab of silicon close to a waveguide."""
 
-    # Deembedding structure
-    [
-        add_gc(ubcpdk.components.straight(), component_name=f"straight_{i}")
-        for i in range(1)
-    ]
-
-    # Test structure
+    # Test structure w/ local loss calibration
+    e = []
     for gap, width in itertools.product(gaps, widths):
-        s0 = gf.Section(
-            width=width,
-            layer=LAYER.WG,
-            name="waveguide",
-        )
-        s1 = gf.Section(
-            width=slab_width,
-            layer=LAYER.WG,
-            offset=slab_width / 2 + gap + width / 2,
-            name="continuum",
-        )
+        e += [
+            add_gc(
+                continuum_coupling(
+                    gap=gap, width=width, length=length, slab_width=slab_width
+                ),
+                with_loopback=True,
+                name=f"continuum_gap_{gap:1.3f}_width_{width:1.3f}_length_{length:1.3f}",
+                fanout_length=30,
+                optical_routing_type=1,
+            )
+            for length in lengths
+        ]
 
-        xs1 = gf.partial(sections=[s0])
-        xs1 = gf.partial(sections=[s0, s1])
-        gf.path.transition(cross_section1=xs1, cross_section2=xs1, width_type="sine")
-
-    # e += [
-    #     add_gc(
-    #         gf.add_tapers(
-    #             pdk.ring_single(
-    #                 radius=radius,
-    #                 gap=gap,
-    #                 length_x=0,
-    #                 length_y=0,
-    #                 bend=bend_circular,
-    #                 bend_coupler=bend_circular,
-    #                 cross_section=gf.partial(strip, width=width),
-    #                 pass_cross_section_to_bend=True,
-    #             ),
-    #             taper=gf.components.taper,
-    #         ),
-    #         component_name=f"ring_width_{width:1.3f}_gap_{gap:1.3f}_radius_{radius:1.3f}",
-    #     )
-    #     for width in widths
-    #     for gap in gaps
-    #     for radius in radii
-    # ]
-
-    # c = gf.pack(e)
-    # m = c[0]
-    # m.name = name
-    # _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
-    # return write_mask_gds_with_metadata(m)
+    c = gf.pack(e)
+    m = c[0]
+    m.name = name
+    _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
+    return write_mask_gds_with_metadata(m)
 
 
 if __name__ == "__main__":
     # m = test_mask_rings_1()
     # m = test_mask_rings_2()
-    m = continuum_coupling()
+    m = test_mask_continuum()
     gf.show(m)
