@@ -39,7 +39,7 @@ def continuum_coupling(
         port_types=("optical", "optical"),
     )
     s1 = gf.Section(
-        width=width,
+        width=0.061,
         layer=LAYER.WG,
         offset=-(slab_width / 2 + gap + width / 2),
         name="continuum",
