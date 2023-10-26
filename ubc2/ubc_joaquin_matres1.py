@@ -10,7 +10,14 @@ from ubcpdk import tech
 from ubcpdk.tech import LAYER
 
 from ubc2.cutback_2x2 import cutback_2x2
-from ubc2.write_mask import add_gc, pack, size, write_mask_gds_with_metadata, size_actives
+from ubc2.write_mask import (
+    add_gc,
+    pack,
+    pack_actives,
+    size,
+    size_actives,
+    write_mask_gds_with_metadata,
+)
 
 
 def test_mask1() -> Path:
@@ -112,7 +119,7 @@ def test_mask4() -> Path:
         for mzi in mzis
     ]
 
-    c = pack(mzis_gc + mzis_heater_gc)
+    c = pack_actives(mzis_gc + mzis_heater_gc)
     m = c[0]
     m.name = "EBeam_heaters_JoaquinMatres_14"
     _ = m << gf.components.rectangle(size=size_actives, layer=LAYER.FLOORPLAN)
@@ -137,7 +144,7 @@ def test_mask5() -> Path:
         for length_x in lengths_x
     ]
 
-    c = pack(rings_gc)
+    c = pack_actives(rings_gc)
     m = c[0]
     m.name = "EBeam_heaters_JoaquinMatres_15"
     _ = m << gf.components.rectangle(size=size_actives, layer=LAYER.FLOORPLAN)
@@ -205,10 +212,10 @@ if __name__ == "__main__":
     # c = test_mask1()  # dbr and mzi
     # c = test_mask2()  # spirals
     # c = test_mask3()  # coupler and crossing
-    # c = test_mask4()  # heated mzis
+    c = test_mask4()  # heated mzis
     # c = test_mask5()  # heated rings
     # c = test_mask6()  # 1x2 mmis
-    c = test_mask7()  # 2x2mmis
+    # c = test_mask7()  # 2x2mmis
     gf.show(c)
     # c = partial(
     #     gf.components.mmi2x2_with_sbend,
