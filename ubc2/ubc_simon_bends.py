@@ -36,16 +36,19 @@ def test_mask_bends_circular(
     # Test structure w/ local loss calibration
     e = []
     for radius, column, row in zip(radii, columns, rows):
+        c = gf.components.cutback_bend90circular(
+            straight_length=1.0,
+            rows=row,
+            columns=column,
+            spacing=5,
+            bend90=gf.partial(bend_circular, radius=radius),
+        )
+        num_bends = c.info["n_bends"]
+
         e += [
             add_gc(
-                gf.components.cutback_bend90circular(
-                    straight_length=1.0,
-                    rows=row,
-                    columns=column,
-                    spacing=5,
-                    bend90=gf.partial(bend_circular, radius=radius),
-                ),
-                name=f"bends_radius_{radius:1.3f}",
+                c,
+                name=f"bends_circular_radius_{radius:1.3f}_nbends_{num_bends}",
                 optical_routing_type=2,
                 fanout_length=1,
                 with_loopback=True,
@@ -82,7 +85,7 @@ def test_mask_bends_euler(
         e += [
             add_gc(
                 c,
-                name=f"bends_radius_{radius:1.3f}",
+                name=f"bends_euler_radius_{radius:1.3f}_nbends_{num_bends}",
                 optical_routing_type=2,
                 with_loopback=True,
                 fanout_length=1,

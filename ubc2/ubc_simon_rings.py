@@ -11,12 +11,10 @@ from gdsfactory.components.via_stack import via_stack_heater_m3
 from gdsfactory.typings import Tuple
 from ubcpdk.tech import LAYER, strip
 
-from ubc2.write_mask import write_mask_gds_with_metadata
+from ubc2.write_mask import size, write_mask_gds_with_metadata
 
 via_stack_heater_m3_mini = partial(via_stack_heater_m3, size=(4, 4))
 
-
-size = (605, 440)
 add_gc = ubcpdk.components.add_fiber_array
 layer_label = LAYER.TEXT
 GC_PITCH = 127
@@ -24,28 +22,32 @@ GC_PITCH = 127
 
 def test_mask_rings(
     widths: Tuple[float] = (0.3, 0.4, 0.5),
-    gaps: Tuple[float] = (0.2, 0.3, 0.4),
-    radii: Tuple[float] = (12,),
-    name: str = "EBeam_simbilod_1",
+    gaps: Tuple[float] = (0.2, 0.3, 0.4, 0.5),
+    radii: Tuple[float] = (8,),
+    name: str = "EBeam_simbilod_30",
+    with_straights: bool = True,
 ) -> Path:
     """Rings with different waveguide widths and gaps."""
 
-    e = [
-        add_gc(
-            gf.add_tapers(
-                ubcpdk.components.straight(
-                    length=2 * (radius + 3),
-                    cross_section=gf.partial(
-                        strip, width=width
-                    ),  # 3 is default ring_coupler length extension
+    e = []
+
+    if with_straights:
+        e += [
+            add_gc(
+                gf.add_tapers(
+                    ubcpdk.components.straight(
+                        length=2 * (radius + 3),
+                        cross_section=gf.partial(
+                            strip, width=width
+                        ),  # 3 is default ring_coupler length extension
+                    ),
+                    taper=gf.components.taper,
                 ),
-                taper=gf.components.taper,
-            ),
-            component_name=f"straight_width_{width:1.3f}",
-        )
-        for width in widths
-        for radius in radii
-    ]
+                component_name=f"straight_width_{width:1.3f}",
+            )
+            for width in widths
+            for radius in radii
+        ]
     e += [
         add_gc(
             gf.add_tapers(
@@ -68,26 +70,30 @@ def test_mask_rings(
         for radius in radii
     ]
 
-    c = gf.pack(e)
+    c = gf.pack(e, max_size=size)
     m = c[0]
     m.name = name
     _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
     return write_mask_gds_with_metadata(m)
 
 
-test_mask_rings_1 = gf.partial(test_mask_rings)
+test_mask_rings_1 = gf.partial(test_mask_rings, name="EBeam_simbilod_30")
 test_mask_rings_2 = gf.partial(
-    test_mask_rings, gaps=(0.25, 0.35, 0.45), name="EBeam_simbilod_2"
+    test_mask_rings, gaps=(0.15, 0.25, 0.35, 0.45), name="EBeam_simbilod_31"
 )
 test_mask_rings_3 = gf.partial(
     test_mask_rings,
     gaps=(0.25, 0.35, 0.45),
     widths=(0.5,),
     radii=(
-        5,
-        8,
+        2,
+        4,
+        6,
+        10,
+        12,
     ),
-    name="EBeam_simbilod_3",
+    name="EBeam_simbilod_32",
+    with_straights=False,
 )
 
 if __name__ == "__main__":
