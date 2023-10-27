@@ -11,12 +11,10 @@ from gdsfactory.components.via_stack import via_stack_heater_m3
 from gdsfactory.typings import CrossSectionSpec
 from ubcpdk.tech import LAYER
 
-from ubc2.write_mask import write_mask_gds_with_metadata
+from ubc2.write_mask import size, write_mask_gds_with_metadata
 
 via_stack_heater_m3_mini = partial(via_stack_heater_m3, size=(4, 4))
 
-
-size = (605, 440)
 add_gc = ubcpdk.components.add_fiber_array
 layer_label = LAYER.TEXT
 GC_PITCH = 127
