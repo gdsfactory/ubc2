@@ -120,8 +120,16 @@ def test_mask_continuum(
     return write_mask_gds_with_metadata(m)
 
 
+test_mask_continuum1 = gf.partial(test_mask_continuum, name="EBeam_simbilod_10")
+test_mask_continuum2 = gf.partial(
+    test_mask_continuum, gaps=(0.2,), name="EBeam_simbilod_11"
+)
+test_mask_continuum3 = gf.partial(
+    test_mask_continuum, gaps=(0.25,), name="EBeam_simbilod_12"
+)
+
 if __name__ == "__main__":
     # m = test_mask_rings_1()
     # m = test_mask_rings_2()
-    m = test_mask_continuum()
+    m = test_mask_continuum2()
     gf.show(m)
