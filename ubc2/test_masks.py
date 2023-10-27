@@ -6,6 +6,8 @@ from ubcpdk.config import PATH
 import ubc2.ubc_helge as m12
 import ubc2.ubc_joaquin_matres1 as m11
 import ubc2.ubc_simon as m13
+import ubc2.ubc_simon_bends as bends
+import ubc2.ubc_simon_loss as loss
 
 
 def test_masks_2023_v1():
@@ -31,6 +33,9 @@ def test_masks_2023_v1():
         m13.test_mask3,
         m13.test_mask4,
         m13.test_mask5,
+        bends.test_mask_bends_circular,
+        bends.test_mask_bends_euler,
+        loss.test_mask_continuum,
     ]:
         mask()
 
