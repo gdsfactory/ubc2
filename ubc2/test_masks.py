@@ -7,6 +7,7 @@ import ubc2.ubc_helge as m12
 import ubc2.ubc_joaquin_matres1 as m11
 import ubc2.ubc_simon as m13
 import ubc2.ubc_simon_bends as bends
+import ubc2.ubc_simon_dcs as dcs
 import ubc2.ubc_simon_loss as loss
 import ubc2.ubc_simon_rings as rings
 
@@ -40,6 +41,12 @@ def test_masks_2023_v1():
         rings.test_mask_rings_1,
         rings.test_mask_rings_2,
         rings.test_mask_rings_3,
+        dcs.test_mask_dcs_1,
+        dcs.test_mask_dcs_2,
+        dcs.test_mask_dcs_3,
+        dcs.test_mask_dcs_4,
+        dcs.test_mask_dcs_5,
+        dcs.test_mask_dcs_6,
     ]:
         mask()
 
