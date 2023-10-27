@@ -13,7 +13,7 @@ from gdsfactory.components.via_stack import via_stack_heater_m3
 from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2
 from ubcpdk.tech import LAYER
 
-from ubc2.write_mask import write_mask_gds_with_metadata, size_actives
+from ubc2.write_mask import size_actives, write_mask_gds_with_metadata
 
 via_stack_heater_m3_mini = partial(via_stack_heater_m3, size=(4, 4))
 
