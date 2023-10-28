@@ -21,13 +21,13 @@ GC_PITCH = 127
 
 
 radii = (2, 4, 6)
-columns = (10, 7, 5)
+cols = (10, 7, 5)
 rows = (3, 5, 8)
 
 
 def test_mask_bends_circular(
     radii: Tuple[float] = radii,
-    columns: Tuple[float] = columns,
+    cols: Tuple[float] = cols,
     rows: Tuple[float] = rows,
     name: str = "EBeam_simbilod_20",
 ) -> Path:
@@ -35,13 +35,13 @@ def test_mask_bends_circular(
 
     # Test structure w/ local loss calibration
     e = []
-    for radius, column, row in zip(radii, columns, rows):
+    for radius, column, row in zip(radii, cols, rows):
         c = gf.components.cutback_bend90circular(
             straight_length=1.0,
             rows=row,
-            columns=column,
+            cols=column,
             spacing=5,
-            bend90=gf.partial(bend_circular, radius=radius),
+            component=gf.partial(bend_circular, radius=radius),
         )
         num_bends = c.info["n_bends"]
 
@@ -64,7 +64,7 @@ def test_mask_bends_circular(
 
 def test_mask_bends_euler(
     radii: Tuple[float] = radii,
-    columns: Tuple[float] = columns,
+    cols: Tuple[float] = cols,
     rows: Tuple[float] = rows,
     name: str = "EBeam_simbilod_21",
 ) -> Path:
@@ -72,13 +72,13 @@ def test_mask_bends_euler(
 
     # Test structure w/ local loss calibration
     e = []
-    for radius, column, row in zip(radii, columns, rows):
+    for radius, column, row in zip(radii, cols, rows):
         c = gf.components.cutback_bend90(
             straight_length=1.0,
             rows=row,
-            columns=column,
+            cols=column,
             spacing=5,
-            bend90=gf.partial(bend_euler, radius=radius),
+            component=gf.partial(bend_euler, radius=radius),
         )
         num_bends = c.info["n_bends"]
 
