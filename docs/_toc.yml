@@ -4,11 +4,13 @@
 format: jb-book
 root: index
 parts:
-  # - caption: Tutorial
-  #   chapters:
-  #     - file: tutorial
-  #       sections:
-  #         - file: notebooks/demo
+  - caption: Tutorial
+    chapters:
+      - file: tutorial
+        sections:
+          - file: notebooks/001_continuum
+          - file: notebooks/002_bends
+          - file: notebooks/003_couplers
   - caption: Reference
     chapters:
       - file: api

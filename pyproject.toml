@@ -14,7 +14,8 @@ classifiers = [
   "Operating System :: OS Independent"
 ]
 dependencies = [
-  "ubcpdk==2.3.2"
+  "ubcpdk==2.3.2",
+  "femwell==0.1.10"
 ]
 description = "ubc"
 keywords = ["python"]
