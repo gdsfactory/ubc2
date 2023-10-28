@@ -48,7 +48,7 @@ def test_mask_bends_circular(
         e += [
             add_gc(
                 c,
-                name=f"bends_circular_radius_{radius:1.3f}_nbends_{num_bends}",
+                component_name=f"bends_circular_radius_{radius:1.3f}_nbends_{num_bends}",
                 optical_routing_type=2,
                 fanout_length=1,
                 with_loopback=True,
@@ -85,7 +85,7 @@ def test_mask_bends_euler(
         e += [
             add_gc(
                 c,
-                name=f"bends_euler_radius_{radius:1.3f}_nbends_{num_bends}",
+                component_name=f"bends_euler_radius_{radius:1.3f}_nbends_{num_bends}",
                 optical_routing_type=2,
                 with_loopback=True,
                 fanout_length=1,
