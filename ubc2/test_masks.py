@@ -4,8 +4,8 @@ import shutil
 from ubcpdk.config import PATH
 
 import ubc2.ubc_helge as m12
-import ubc2.ubc_joaquin_mater_heaters as heaters
 import ubc2.ubc_joaquin_matres1 as m11
+import ubc2.ubc_joaquin_matres_heaters as heaters
 import ubc2.ubc_simon as m13
 import ubc2.ubc_simon_bends as bends
 import ubc2.ubc_simon_dcs as dcs
