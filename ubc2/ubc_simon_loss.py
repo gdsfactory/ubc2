@@ -106,7 +106,7 @@ def test_mask_continuum(
                     gap=gap, width=width, length=length, slab_width=slab_width
                 ),
                 with_loopback=True,
-                name=f"continuum_gap_{gap:1.3f}_width_{width:1.3f}_length_{length:1.3f}",
+                component_name=f"continuum_gap_{gap:1.3f}_width_{width:1.3f}_length_{length:1.3f}",
                 fanout_length=30,
                 optical_routing_type=1,
             )
