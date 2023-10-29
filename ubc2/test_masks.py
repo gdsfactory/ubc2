@@ -5,10 +5,11 @@ from ubcpdk.config import PATH
 
 import ubc2.ubc_helge as m12
 import ubc2.ubc_joaquin_matres1 as m11
+import ubc2.ubc_joaquin_matres_heaters as heaters
 import ubc2.ubc_simon as m13
 import ubc2.ubc_simon_bends as bends
 import ubc2.ubc_simon_dcs as dcs
-import ubc2.ubc_simon_heaters as heaters
+import ubc2.ubc_simon_heaters as heaters_simon
 import ubc2.ubc_simon_loss as loss
 import ubc2.ubc_simon_rings as rings
 
@@ -50,13 +51,15 @@ def test_masks_2023_v1():
         dcs.test_mask_dcs_4,
         dcs.test_mask_dcs_5,
         dcs.test_mask_dcs_6,
-        heaters.test_mask_heating1,  # 50
-        heaters.test_mask_heating2,
-        heaters.test_mask_heating3,
-        heaters.test_mask_heating4,
-        heaters.test_mask_heating5,
-        heaters.test_mask_heating6,
-        heaters.test_mask_heating7,
+        heaters_simon.test_mask_heating1,  # 50
+        heaters_simon.test_mask_heating2,
+        heaters_simon.test_mask_heating3,
+        heaters_simon.test_mask_heating4,
+        heaters_simon.test_mask_heating5,
+        heaters_simon.test_mask_heating6,
+        heaters_simon.test_mask_heating7,
+        heaters.test_mzi_heater,
+        heaters.test_ring_heater,
     ]:
         mask()
 

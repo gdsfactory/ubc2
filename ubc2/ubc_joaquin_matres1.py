@@ -1,6 +1,5 @@
 """Sample mask for the edx course Q1 2023."""
 
-from functools import partial
 from pathlib import Path
 
 import gdsfactory as gf
@@ -13,11 +12,11 @@ from ubc2.cutback_2x2 import cutback_2x2
 from ubc2.write_mask import (
     add_gc,
     pack,
-    pack_actives,
     size,
-    size_actives,
     write_mask_gds_with_metadata,
 )
+
+length_x = 0.1
 
 
 def test_mask1() -> Path:
@@ -108,46 +107,46 @@ def test_mask3() -> Path:
 
 
 def test_mask4() -> Path:
-    """Heated MZI interferometers."""
-    mzi = partial(gf.components.mzi, splitter=ubcpdk.components.ebeam_y_1550)
-    mzis = [mzi(delta_length=delta_length) for delta_length in [10, 40, 100]]
-    mzis_gc = [pdk.add_fiber_array(mzi) for mzi in mzis]
+    """Ring resonators Radius 10um."""
+    gaps = [50, 100, 150, 200]
+    radiuses = [10]
 
-    mzis = [pdk.mzi_heater(delta_length=delta_length) for delta_length in [40]]
-    mzis_heater_gc = [
-        pdk.add_fiber_array_pads_rf(mzi, orientation=90, optical_routing_type=2)
-        for mzi in mzis
+    rings = [
+        pdk.ring_double(
+            radius=radius, length_x=length_x, gap=gap * 1e-3, decorator=add_gc
+        )
+        for radius in radiuses
+        for gap in gaps
+    ]
+    gaps = [100, 150]
+    radiuses = [3]
+    rings += [
+        pdk.ring_double(
+            radius=radius, length_x=length_x, gap=gap * 1e-3, decorator=add_gc
+        )
+        for radius in radiuses
+        for gap in gaps
     ]
 
-    c = pack_actives(mzis_gc + mzis_heater_gc)
+    c = pack(rings)
     m = c[0]
-    m.name = "EBeam_heaters_JoaquinMatres_14"
-    _ = m << gf.components.rectangle(size=size_actives, layer=LAYER.FLOORPLAN)
+    m.name = "EBeam_JoaquinMatres_14"
+    _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
     return write_mask_gds_with_metadata(m)
 
 
 def test_mask5() -> Path:
-    """Heated Ring resonators."""
-    lengths_x = [0.2]
-    gaps = [0.2]
-
-    rings = [
-        pdk.ring_double_heater(radius=12, length_x=length_x, gap=gap)
-        for length_x in lengths_x
-        for gap in gaps
-    ]
-    rings = [gf.functions.rotate180(ring) for ring in rings]
-    rings_gc = [pdk.add_fiber_array_pads_rf(ring) for ring in rings]
-    rings_gc += [
-        add_gc(pdk.ring_double(radius=12, gap=gap, length_x=length_x))
-        for gap in gaps
-        for length_x in lengths_x
+    """Ring resonators."""
+    e = []
+    e += [
+        pdk.dbr_cavity_te(dw=dw * 1e-3, n=350)
+        for dw in [5, 10, 20, 40, 60, 80, 100, 150, 200]
     ]
 
-    c = pack_actives(rings_gc)
+    c = pack(e)
     m = c[0]
-    m.name = "EBeam_heaters_JoaquinMatres_15"
-    _ = m << gf.components.rectangle(size=size_actives, layer=LAYER.FLOORPLAN)
+    m.name = "EBeam_JoaquinMatres_15"
+    _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
     return write_mask_gds_with_metadata(m)
 
 
@@ -212,8 +211,8 @@ if __name__ == "__main__":
     # c = test_mask1()  # dbr and mzi
     # c = test_mask2()  # spirals
     # c = test_mask3()  # coupler and crossing
-    c = test_mask4()  # heated mzis
-    # c = test_mask5()  # heated rings
+    # c = test_mask4()  # rings
+    c = test_mask5()  # dbr cavity
     # c = test_mask6()  # 1x2 mmis
     # c = test_mask7()  # 2x2mmis
     gf.show(c)
