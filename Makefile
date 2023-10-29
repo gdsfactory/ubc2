@@ -6,7 +6,7 @@ dev: gmsh
 	pip install -e .[dev,docs]
 
 gmsh:
-	sudo apt-get install -y python3-gmsh gmsh libglu1-mesa libxi-dev libxmu-dev libglu1-mesa-dev
+	sudo apt install -y python3-gmsh gmsh libglu1-mesa libxi-dev libxmu-dev libglu1-mesa-dev
 
 test:
 	pytest -s
