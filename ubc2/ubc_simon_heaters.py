@@ -68,6 +68,9 @@ def mzi_xtalk(
     transition_xs = gf.path.transition(
         cross_section1=regular_xs, cross_section2=experiment_xs, width_type="sine"
     )
+    transition_xs_reversed = gf.path.transition(
+        cross_section1=experiment_xs, cross_section2=regular_xs, width_type="sine"
+    )
 
     # Bring waveguides within some distance, transitioning width
     base_distance = splitter.ports["o3"].y - splitter.ports["o4"].y
@@ -86,8 +89,11 @@ def mzi_xtalk(
     spacer_bot_left.connect("o1", destination=splitter.ports["o4"])
 
     #  Heating region
+    heater_xs = gf.partial(ubcpdk.tech.strip_heater_metal, width=waveguide_width)
     heater_top = c << gf.components.straight_heater_metal(
-        length=length_heater, cross_section=experiment_xs
+        length=length_heater,
+        cross_section=experiment_xs,
+        cross_section_waveguide_heater=heater_xs,
     )
     heater_top.connect("o1", destination=spacer_top_left.ports["o2"])
 
@@ -97,11 +103,15 @@ def mzi_xtalk(
     straight_bottom.connect("o1", destination=spacer_bot_left.ports["o2"])
 
     # Reverse
-    spacer_top_right = c << gf.components.bend_s(size=(length_unheated, distance / 2))
+    spacer_top_right = c << gf.components.bend_s(
+        size=(length_unheated, distance / 2), cross_section=transition_xs_reversed
+    )
     spacer_top_right.mirror()
     spacer_top_right.connect("o1", destination=heater_top.ports["o2"])
 
-    spacer_bot_right = c << gf.components.bend_s(size=(length_unheated, -distance / 2))
+    spacer_bot_right = c << gf.components.bend_s(
+        size=(length_unheated, -distance / 2), cross_section=transition_xs_reversed
+    )
     spacer_bot_right.mirror()
     spacer_bot_right.connect("o1", destination=straight_bottom.ports["o2"])
 
@@ -240,7 +250,7 @@ test_mask_heating7 = gf.partial(
 )
 
 if __name__ == "__main__":
-    m = test_mask_heating3()
+    m = test_mask_heating6()
     # m = test_mask3()
     # m = test_mask4()
     # m = test_mask5()
