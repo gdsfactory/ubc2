@@ -14,7 +14,7 @@ classifiers = [
   "Operating System :: OS Independent"
 ]
 dependencies = [
-  "ubcpdk==2.3.3",
+  "ubcpdk==2.3.4",
   "femwell==0.1.10"
 ]
 description = "ubc"
