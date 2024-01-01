@@ -30,7 +30,7 @@ jobs:
           make mask
           pip freeze > requirements.txt
           cp requirements.txt build/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: mask
           path: build
