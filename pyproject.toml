@@ -15,7 +15,7 @@ classifiers = [
 ]
 dependencies = [
   "ubcpdk==2.3.3",
-  "femwell==0.1.10"
+  "femwell==0.1.12"
 ]
 description = "ubc"
 keywords = ["python"]
