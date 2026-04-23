@@ -6,128 +6,23 @@ from pathlib import Path
 import gdsfactory as gf
 import ubcpdk
 import ubcpdk.components as pdk
-from gdsfactory.components.bend_euler import bend_euler
-from gdsfactory.components.coupler_ring import coupler_ring as _coupler_ring
-from gdsfactory.components.straight import straight
+from gdsfactory.components.bend_circular import bend_circular
+from gdsfactory.components.coupler_ring import coupler_ring, coupler_ring_point
+from gdsfactory.components.ring_double_heater import ring_double_heater
 from gdsfactory.components.via_stack import via_stack_heater_m3
-from gdsfactory.typings import ComponentSpec, CrossSectionSpec, Float2
+from gdsfactory.typings import ComponentSpec
+from ubcpdk.components import ebeam_terminator_te1550
 from ubcpdk.tech import LAYER
 
-from ubc2.write_mask import size_actives, write_mask_gds_with_metadata
+from ubc2.write_mask import write_mask_gds_with_metadata
 
 via_stack_heater_m3_mini = partial(via_stack_heater_m3, size=(4, 4))
 
 
-size = size_actives
+size = (440, 470)
 add_gc = ubcpdk.components.add_fiber_array
 layer_label = LAYER.TEXT
 GC_PITCH = 127
-
-
-@gf.cell
-def ring_single_heater(
-    gap: float = 0.2,
-    radius: float = 10.0,
-    length_x: float = 4.0,
-    length_y: float = 0.6,
-    coupler_ring: ComponentSpec = _coupler_ring,
-    bend: ComponentSpec = bend_euler,
-    cross_section_waveguide_heater: CrossSectionSpec = "xs_sc_heater_metal",
-    cross_section: CrossSectionSpec = "xs_sc",
-    via_stack: ComponentSpec = via_stack_heater_m3_mini,
-    port_orientation: tuple[float, ...] | None = (180, 0),
-    via_stack_offset: Float2 = (0, 0),
-    **kwargs,
-) -> gf.Component:
-    """Override from gdsfactory to make ports face different directions.
-
-    Returns a single ring with heater on top.
-
-    ring coupler (cb: bottom) connects to two vertical straights (sl: left, sr: right),
-    two bends (bl, br) and horizontal straight (wg: top)
-
-    Args:
-        gap: gap between for coupler.
-        radius: for the bend and coupler.
-        length_x: ring coupler length.
-        length_y: vertical straight length.
-        coupler_ring: ring coupler function.
-        bend: 90 degrees bend function.
-        cross_section_waveguide_heater: for heater.
-        cross_section: for regular waveguide.
-        via_stack: for heater to routing metal.
-        port_orientation: for electrical ports to promote from via_stack.
-        via_stack_offset: x,y offset for via_stack.
-        kwargs: cross_section settings.
-
-    .. code::
-
-          bl-st-br
-          |      |
-          sl     sr length_y
-          |      |
-         --==cb==-- gap
-
-          length_x
-    """
-    gap = gf.snap.snap_to_grid(gap, nm=2)
-
-    coupler_ring = gf.get_component(
-        coupler_ring,
-        bend=bend,
-        gap=gap,
-        radius=radius,
-        length_x=length_x,
-        cross_section=cross_section,
-        cross_section_bend=cross_section_waveguide_heater,
-        **kwargs,
-    )
-
-    straight_side = straight(
-        length=length_y,
-        cross_section=cross_section_waveguide_heater,
-        **kwargs,
-    )
-    straight_top = straight(
-        length=length_x,
-        cross_section=cross_section_waveguide_heater,
-        **kwargs,
-    )
-
-    bend = gf.get_component(
-        bend, radius=radius, cross_section=cross_section_waveguide_heater, **kwargs
-    )
-
-    c = gf.Component()
-    cb = c << coupler_ring
-    sl = c << straight_side
-    sr = c << straight_side
-    bl = c << bend
-    br = c << bend
-    st = c << straight_top
-
-    sl.connect(port="o1", destination=cb.ports["o2"])
-    bl.connect(port="o2", destination=sl.ports["o2"])
-
-    st.connect(port="o2", destination=bl.ports["o1"])
-    br.connect(port="o2", destination=st.ports["o1"])
-    sr.connect(port="o1", destination=br.ports["o1"])
-    sr.connect(port="o2", destination=cb.ports["o3"])
-
-    c.add_port("o2", port=cb.ports["o4"])
-    c.add_port("o1", port=cb.ports["o1"])
-
-    via = gf.get_component(via_stack)
-    c1 = c << via
-    c2 = c << via
-    c1.xmax = -length_x / 2 + cb.x - via_stack_offset[0]
-    c2.xmin = +length_x / 2 + cb.x + via_stack_offset[0]
-    c1.movey(via_stack_offset[1])
-    c2.movey(via_stack_offset[1])
-    c.add_ports(c1.get_ports_list(orientation=port_orientation[0]), prefix="e1")
-    c.add_ports(c2.get_ports_list(orientation=port_orientation[1]), prefix="e2")
-    c.auto_rename_ports()
-    return c
 
 
 @gf.cell
@@ -147,23 +42,59 @@ def rings_proximity(
     c = gf.Component()
     gap = 0.2  # TODO: make variable
     width = 0.5  # TODO: make variable
+
+    coupler_ring_heater = gf.partial(
+        coupler_ring_point,
+        open_layers=(
+            LAYER.M1_HEATER,
+            LAYER.M2_ROUTER,
+        ),
+        open_sizes=((5.0, 5.0), (5.0, 5.0)),
+        bend=bend_circular,
+        gap=gap,
+        length_x=0.0,
+        cross_section="xs_sc",
+    )
+
+    _coupler_ring = gf.partial(
+        coupler_ring,
+        bend=bend_circular,
+        gap=gap,
+        radius=radius,
+        length_x=0.0,
+        cross_section="xs_sc",
+    )
+
     for index in range(num_rings):
         if index in [0, num_rings // 2]:
-            ring = c << ring_single_heater(
-                length_x=2, via_stack=pdk.via_stack_heater_mtop
+            ring = c << ring_double_heater(
+                length_x=0,
+                via_stack=pdk.via_stack_heater_mtop,
+                coupler_ring=coupler_ring_heater,
+                coupler_ring_top=_coupler_ring,
+                bend=bend_circular,
+                port_orientation=(180.0, 0.0),
+                via_stack_offset=(2.5, -3),
             )
             ring.rotate(90).movex(
                 -index * (sep_resonators + 2 * radius + 3 * width - gap)
             )
-            c.add_port(f"e1_{index}", port=ring.ports["e1"])
-            c.add_port(f"e2_{index}", port=ring.ports["e2"])
+            c.add_port(f"e1_{index}", port=ring.ports["l_e1"])
+            c.add_port(f"e2_{index}", port=ring.ports["r_e3"])
+
         else:
-            ring = c << gf.components.ring_single(length_x=2)
+            ring = c << gf.components.ring_double(length_x=0, bend=bend_circular)
             ring.rotate(90).movex(
                 -index * (sep_resonators + 2 * radius + 3 * width - gap)
             )
         c.add_port(f"o1_{index}", port=ring.ports["o1"])
         c.add_port(f"o2_{index}", port=ring.ports["o2"])
+
+        term1 = c << ebeam_terminator_te1550()
+        term2 = c << ebeam_terminator_te1550()
+
+        term1.connect("o1", ring.ports["o3"])
+        term2.connect("o1", ring.ports["o4"])
 
     return c
 
@@ -197,6 +128,7 @@ def disks_proximity(
             ).movex(-index * (sep_resonators + 2 * radius + 2 * width + gap))
         c.add_port(f"o1_{index}", port=disk.ports["o1"])
         c.add_port(f"o2_{index}", port=disk.ports["o2"])
+
     return c
 
 
@@ -365,12 +297,12 @@ def test_mask1() -> Path:
 
     m.add_ports(g.ports)
     _ = m << gf.components.rectangle(size=size, layer=LAYER.FLOORPLAN)
-    m.name = "EBeam_heaters_JoaquinMatres_Simon_0"
+    m.name = "EBeam_JoaquinMatres_Simon_0"
     return write_mask_gds_with_metadata(m)
 
 
 def crosstalk_experiment_parametrized_mask(
-    name="EBeam_heaters_JoaquinMatres_Simon_1",
+    name="EBeam_JoaquinMatres_Simon_1",
     num_gcs: int = 10,
     num_gc_per_pitch: int = 5,
     sep_resonators: float = 15.0,
@@ -379,6 +311,7 @@ def crosstalk_experiment_parametrized_mask(
     fill_layers=None,
     fill_margin=2,
     fill_size=(0.5, 0.5),
+    padding=20,
 ) -> gf.Component:
     """Ring resonators with thermal cross-talk.
 
@@ -392,6 +325,7 @@ def crosstalk_experiment_parametrized_mask(
         fill_layers: layers to add as unity dennity fill around the rings.
         fill_margin: keepout between the fill_layers and the same design layers.
         fill_size: tiling size.
+        padding: how much to extend the fill beyond the ring component.
     """
     m = gf.Component()
 
@@ -550,7 +484,7 @@ def crosstalk_experiment_parametrized_mask(
 def test_mask3() -> Path:
     """Rings with thermal crosstalk, close rings"""
     m = crosstalk_experiment_parametrized_mask(
-        name="EBeam_heaters_JoaquinMatres_Simon_1",
+        name="EBeam_heaters_simbilod",
         sep_resonators=5.0,
         ring_y_offset=20.0,
         resonator_func=rings_proximity,
@@ -596,8 +530,8 @@ def test_mask6() -> Path:
 
 
 if __name__ == "__main__":
-    m = test_mask1()
+    # m = test_mask1()
     # m = test_mask3()
     # m = test_mask4()
-    # m = test_mask5()
+    m = test_mask5()
     gf.show(m)
